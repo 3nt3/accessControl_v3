@@ -22,6 +22,8 @@ func main() {
 // Get accounts
 func GetData(table string) types.Slice {
 
+	data := types.Slice{}
+
 	db, err := sql.Open("mysql", dataSorceString)
 	if err != nil {
 		fmt.Println("Connection Failed:", err)
@@ -48,7 +50,6 @@ func GetData(table string) types.Slice {
 
 			data = append(data, Account{strconv.Itoa(id), uid, name, tag_name, strconv.Itoa(permission)})
 		}
-
 	case "statusLog":
 		data := []Status{}
 
@@ -76,13 +77,14 @@ func GetData(table string) types.Slice {
 			var userPermission string
 
 			var publishDate string
-			err = rows.Scan(&id, &status, &creator, &publishDate)
+			err = rows.Scan(&id, &status, &userID, &userUID, &userName, &userTagName, &userPermission, &publishDate)
 			checkErr(err)
 
-			account := Account{userID, userUID, userName, userTagName, userPermission}
+			account := Account{strconv.Itoa(userID), strconv.Itoa(userUID), userName, userTagName, userPermission}
 
-			data = append(data, Access{strconv.Itoa(id), strconv.Itoa(status), creator, publishDate})
+			data = append(data, Access{id, account, publishDate})
 		}
+
 	}
 
 	//fmt.Println(Accounts)
@@ -90,39 +92,6 @@ func GetData(table string) types.Slice {
 	db.Close()
 
 	return data
-}
-
-func GetStatusLog() {
-	Accounts := []Account{}
-
-	db, err := sql.Open("mysql", dataSorceString)
-	if err != nil {
-		fmt.Println("Connection Failed:", err)
-	} else {
-		fmt.Println("Connected!")
-	}
-
-	// Get the data!!
-	rows, err := db.Query("SELECT * FROM Accounts;")
-	checkErr(err)
-
-	for rows.Next() {
-		var id int
-		var uid string
-		var name string
-		var tag_name string
-		var permission int8
-		err = rows.Scan(&id, &uid, &name, &tag_name, &permission)
-		checkErr(err)
-
-		Accounts = append(Accounts, Account{id, uid, name, tag_name, permission})
-	}
-
-	//fmt.Println(Accounts)
-
-	db.Close()
-
-	return Accounts
 }
 
 func checkErr(err error) {
