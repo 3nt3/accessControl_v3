@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
@@ -17,11 +18,11 @@ type Status struct {
 
 // Account / Tag struct
 type Account struct {
-	id         string `json:"id"`
-	uid        string `json:"uid"`
-	name       string `json:"name"`
-	tagName    string `json:"tagName"`
-	permission string `json:"permission"`
+	Id         string `json:"id"`
+	Uid        string `json:"uid"`
+	Name       string `json:"name"`
+	TagName    string `json:"tagName"`
+	Permission string `json:"permission"`
 }
 
 // Access struct
@@ -32,8 +33,10 @@ type Access struct {
 }
 
 // Get current Status
-func getStatus(w http.ResponseWriter, r *http.Request) {
-
+func getStatuses(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	fmt.Println(GetData("statusLog"))
+	//fmt.Println(json.NewEncoder(w).Encode())
 }
 
 // Update current Status
@@ -61,7 +64,7 @@ func main() {
 	r := mux.NewRouter()
 
 	// Route Handlers / Endpoints
-	r.HandleFunc("/api/getStatus", getStatus).Methods("GET")
+	r.HandleFunc("/api/getStatuses", getStatuses).Methods("GET")
 	r.HandleFunc("/api/addStatus", updateStatus).Methods("POST")
 	r.HandleFunc("/api/hasAccess/{uid}", hasAccess).Methods("GET")
 	r.HandleFunc("/api/open", open).Methods("GET")
