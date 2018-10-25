@@ -14,17 +14,10 @@ var dataSorceString string = fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8", DB_USR
 func GetData(table string) []interface{} {
 
 	db, err := sql.Open("mysql", dataSorceString)
-	if err != nil {
-		fmt.Println("Connection Failed:", err)
-	} else {
-		fmt.Println("Connected!")
-	}
 
 	// Get the data!!
 	rows, err := db.Query(fmt.Sprintf("SELECT * FROM %s;", table))
 	checkErr(err)
-
-	fmt.Println(table)
 
 	switch table {
 	case "accounts":
@@ -39,8 +32,8 @@ func GetData(table string) []interface{} {
 			err = rows.Scan(&id, &uid, &name, &tag_name, &permission)
 			checkErr(err)
 
-			data = append(data, id, uid, name, tag_name, permission)
-			fmt.Println(data)
+			data = append(data, Account{strconv.Itoa(id), uid, name, tag_name, strconv.Itoa(permission)})
+			//fmt.Println(data)
 		}
 		return data
 		break
@@ -55,10 +48,8 @@ func GetData(table string) []interface{} {
 			err = rows.Scan(&id, &status, &creator, &publishDate)
 			checkErr(err)
 
-			fmt.Println(data)
+			data = append(data, Status{id, strconv.Itoa(status), creator, publishDate})
 
-			data = append(data, Status{strconv.Itoa(id), strconv.Itoa(status), creator, publishDate})
-			fmt.Println(data)
 		}
 		return data
 		break
@@ -129,7 +120,7 @@ func InsertData(table string, data []interface{}) bool {
 		checkErr(err)
 		return true
 	}
-
+	return true
 }
 
 func checkErr(err error) {

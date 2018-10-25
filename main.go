@@ -10,7 +10,7 @@ import (
 
 // Status struct
 type Status struct {
-	ID          string `json:"id"`
+	ID          int    `json:"id"`
 	Status      string `json:"status"`
 	Creator     string `json:"creator"`
 	PublishDate string `json:"publishDate"`
@@ -42,16 +42,32 @@ func getStatuses(w http.ResponseWriter, r *http.Request) {
 func updateStatus(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	var status Status
-	_ = json.NewDecoder(r.Body).Decode(&status)
+	var newStatus Status
+	_ = json.NewDecoder(r.Body).Decode(&newStatus)
 
-	data := []interface{}{status.Status, status.Creator}
+	data := []interface{}{newStatus.Status, newStatus.Creator}
 	InsertData("statusLog", data)
+	json.NewEncoder(w).Encode(GetData("statusLog")[len(GetData("statusLog"))-1])
 }
 
 // Check if UID has access
 func hasAccess(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var jsonData map[string]string
+	_ = json.NewDecoder(r.Body).Decode(&jsonData)
 
+	uid := jsonData["uid"]
+	var uidHasAccess bool
+
+	for _, item := range GetData("accounts") {
+		var account Account = item.(Account)
+		if account.Uid == uid {
+			uidHasAccess = true
+			break
+		}
+	}
+
+	json.NewEncoder(w).Encode(uidHasAccess)
 }
 
 // Open the door
@@ -70,10 +86,10 @@ func main() {
 
 	// Route Handlers / Endpoints
 	r.HandleFunc("/api/getStatuses", getStatuses).Methods("GET")
-	r.HandleFunc("/api/addStatus", updateStatus).Methods("POST")
-	r.HandleFunc("/api/hasAccess/{uid}", hasAccess).Methods("GET")
+	r.HandleFunc("/api/updateStatus", updateStatus).Methods("POST")
+	r.HandleFunc("/api/hasAccess", hasAccess).Methods("POST")
+	r.HandleFunc("/api/logAccess", logToDB).Methods("POST")
 	r.HandleFunc("/api/open", open).Methods("GET")
-	r.HandleFunc("/api/log", logToDB).Methods("GET")
 
 	// Start server
 	log.Fatal(http.ListenAndServe(":8000", r))
