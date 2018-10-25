@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
@@ -35,8 +35,7 @@ type Access struct {
 // Get current Status
 func getStatuses(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Println(GetData("statusLog"))
-	//fmt.Println(json.NewEncoder(w).Encode())
+	json.NewEncoder(w).Encode(GetData("statusLog"))
 }
 
 // Update current Status

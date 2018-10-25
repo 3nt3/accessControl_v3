@@ -4,20 +4,14 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	"go/types"
 	"strconv"
 	"time"
 )
 
-const DB_HOST = "host"
-const DB_USR = "account"
-const DB_PASSWORD = "password"
-const DB_NAME = "name"
-
 var dataSorceString string = fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8", DB_USR, DB_PASSWORD, DB_HOST, DB_NAME)
 
 // Get accounts
-func GetData(table string) types.Slice {
+func GetData(table string) []interface{} {
 
 	db, err := sql.Open("mysql", dataSorceString)
 	if err != nil {
@@ -36,22 +30,24 @@ func GetData(table string) types.Slice {
 
 	switch table {
 	case "accounts":
-		data := []Account{}
-
+		var data []interface{}
 		for rows.Next() {
 			var id int
 			var uid string
 			var name string
 			var tag_name string
 			var permission int
+
 			err = rows.Scan(&id, &uid, &name, &tag_name, &permission)
 			checkErr(err)
 
-			data = append(data, Account{strconv.Itoa(id), uid, name, tag_name, strconv.Itoa(permission)})
+			data = append(data, id, uid, name, tag_name, permission)
+			fmt.Println(data)
 		}
 		return data
+		break
 	case "statusLog":
-		data := []Status{}
+		var data []interface{}
 
 		for rows.Next() {
 			var id int
@@ -64,11 +60,12 @@ func GetData(table string) types.Slice {
 			fmt.Println(data)
 
 			data = append(data, Status{strconv.Itoa(id), strconv.Itoa(status), creator, publishDate})
-			fmt.Printf("After: %s\n", data)
-
+			fmt.Println(data)
 		}
+		return data
+		break
 	case "accessLog":
-		data := []Access{}
+		var data []interface{}
 
 		for rows.Next() {
 			var id int
@@ -91,15 +88,19 @@ func GetData(table string) types.Slice {
 
 			data = append(data, Access{id, account, date})
 			fmt.Println(data)
-
 		}
+		return data
+		break
 	default:
 		fmt.Println("The specified table does not exist!")
+		return nil
+		break
 	}
 
 	//fmt.Println(Accounts)
 
 	db.Close()
+	return nil
 }
 
 func checkErr(err error) {
