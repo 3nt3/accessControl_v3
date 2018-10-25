@@ -20,8 +20,6 @@ func GetData(table string) []interface{} {
 		fmt.Println("Connected!")
 	}
 
-	table = "statusLog"
-
 	// Get the data!!
 	rows, err := db.Query(fmt.Sprintf("SELECT * FROM %s;", table))
 	checkErr(err)
@@ -71,23 +69,16 @@ func GetData(table string) []interface{} {
 			var id int
 			var status int
 
-			var userID int
-			var userUID int
 			var userName string
-			var userTagName string
-			var userPermission string
 
 			var publishDate string
 
-			err = rows.Scan(&id, &status, &userID, &userUID, &userName, &userTagName, &userPermission, &publishDate)
+			err = rows.Scan(&id, &status, &userName, &publishDate)
 			checkErr(err)
-
-			account := Account{strconv.Itoa(userID), strconv.Itoa(userUID), userName, userTagName, userPermission}
 
 			date, _ := time.Parse("2006-01-02 15:04:05", publishDate)
 
-			data = append(data, Access{id, account, date})
-			fmt.Println(data)
+			data = append(data, Access{id, userName, date})
 		}
 		return data
 		break
@@ -101,6 +92,44 @@ func GetData(table string) []interface{} {
 
 	db.Close()
 	return nil
+}
+
+func InsertData(table string, data []interface{}) bool {
+
+	// Establish connection
+	db, err := sql.Open("mysql", dataSorceString)
+	if err != nil {
+		fmt.Println("Connection Failed:", err)
+		return false
+	}
+
+	// Actual insert
+	switch table {
+	case "accounts":
+		stmt, err := db.Prepare(fmt.Sprintf("INSERT %s SET uid=?,name=?,tag_name=?,permission=?", table))
+		checkErr(err)
+
+		_, err = stmt.Exec(data[0], data[1], data[2], data[3])
+		checkErr(err)
+		return true
+
+	case "statusLog":
+		stmt, err := db.Prepare(fmt.Sprintf("INSERT %s SET status=?,creator=?", table))
+		checkErr(err)
+
+		_, err = stmt.Exec(data[0], data[1])
+		checkErr(err)
+		return true
+
+	case "accessLog":
+		stmt, err := db.Prepare(fmt.Sprintf("INSERT %s SET uid=?,name=?,publishDate=?", table))
+		checkErr(err)
+
+		_, err = stmt.Exec(data[0], data[1], data[2])
+		checkErr(err)
+		return true
+	}
+
 }
 
 func checkErr(err error) {

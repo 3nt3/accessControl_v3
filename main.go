@@ -28,7 +28,7 @@ type Account struct {
 // Access struct
 type Access struct {
 	id         int
-	account    Account
+	account    string
 	accessDate time.Time
 }
 
@@ -40,7 +40,13 @@ func getStatuses(w http.ResponseWriter, r *http.Request) {
 
 // Update current Status
 func updateStatus(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 
+	var status Status
+	_ = json.NewDecoder(r.Body).Decode(&status)
+
+	data := []interface{}{status.Status, status.Creator}
+	InsertData("statusLog", data)
 }
 
 // Check if UID has access
