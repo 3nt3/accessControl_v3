@@ -23,7 +23,7 @@ func GetData(table string) []interface{} {
 	case "accounts":
 		var data []interface{}
 		for rows.Next() {
-			var id int
+			var id string
 			var uid string
 			var name string
 			var tag_name string
@@ -32,7 +32,7 @@ func GetData(table string) []interface{} {
 			err = rows.Scan(&id, &uid, &name, &tag_name, &permission)
 			checkErr(err)
 
-			data = append(data, Account{strconv.Itoa(id), uid, name, tag_name, strconv.Itoa(permission)})
+			data = append(data, Account{id, uid, name, tag_name, strconv.Itoa(permission)})
 			//fmt.Println(data)
 		}
 		return data
@@ -58,13 +58,11 @@ func GetData(table string) []interface{} {
 
 		for rows.Next() {
 			var id int
-			var status int
-
+			var uid string
 			var userName string
-
 			var publishDate string
 
-			err = rows.Scan(&id, &status, &userName, &publishDate)
+			err = rows.Scan(&id, &uid, &userName, &publishDate)
 			checkErr(err)
 
 			date, _ := time.Parse("2006-01-02 15:04:05", publishDate)

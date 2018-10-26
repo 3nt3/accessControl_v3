@@ -2,9 +2,11 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -61,9 +63,37 @@ func hasAccess(w http.ResponseWriter, r *http.Request) {
 
 	for _, item := range GetData("accounts") {
 		var account Account = item.(Account)
+
 		if account.Uid == uid {
-			uidHasAccess = true
-			break
+			if account.Permission == "99" || account.Permission == "100" {
+				uidHasAccess = true
+				break
+			} else {
+				accesses := 0
+				for _, item := range GetData("accessLog") {
+					var access Access = item.(Access)
+					var isToday bool
+
+					accessYear, accessDay := access.accessDate.Year(), access.accessDate.YearDay()
+					now := time.Now()
+
+					if accessYear == now.Year() && accessDay == now.YearDay() {
+						isToday = true
+					}
+
+					if access.account == account.Name && isToday {
+						accesses++
+					}
+				}
+				permission, _ := strconv.Atoi(account.Permission)
+
+				if accesses < permission {
+					uidHasAccess = true
+					fmt.Printf("%s - %s hasPermission\nPossible accesses today: %d\n", account.Uid, account.Name, permission-accesses)
+				} else {
+					fmt.Printf("%s - %s !hasPermission\nPossible accesses today: %d\n", account.Uid, account.Name, permission-accesses)
+				}
+			}
 		}
 	}
 
@@ -76,7 +106,7 @@ func open(w http.ResponseWriter, r *http.Request) {
 }
 
 // Log to DB
-func logToDB(w http.ResponseWriter, r *http.Request) {
+func logAccess(w http.ResponseWriter, r *http.Request) {
 
 }
 
@@ -88,9 +118,9 @@ func main() {
 	r.HandleFunc("/api/getStatuses", getStatuses).Methods("GET")
 	r.HandleFunc("/api/updateStatus", updateStatus).Methods("POST")
 	r.HandleFunc("/api/hasAccess", hasAccess).Methods("POST")
-	r.HandleFunc("/api/logAccess", logToDB).Methods("POST")
+	r.HandleFunc("/api/logAccess", logAccess).Methods("POST")
 	r.HandleFunc("/api/open", open).Methods("GET")
 
 	// Start server
-	log.Fatal(http.ListenAndServe(":8000", r))
+	go log.Fatal(http.ListenAndServe(":8000", r))
 }
