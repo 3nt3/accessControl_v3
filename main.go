@@ -34,10 +34,20 @@ type Access struct {
 	accessDate time.Time
 }
 
-// Get current Status
+// Get all statuses
 func getStatuses(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(GetData("statusLog"))
+}
+
+// Get current status
+func getStatus(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	data := GetData("statusLog")
+
+	json.NewEncoder(w).Encode(data[len(data)-1])
+
 }
 
 // Update current Status
@@ -102,7 +112,7 @@ func hasAccess(w http.ResponseWriter, r *http.Request) {
 
 // Open the door
 func open(w http.ResponseWriter, r *http.Request) {
-
+	// I actually do not have any clue how to open the door
 }
 
 // Log to DB
@@ -116,6 +126,7 @@ func main() {
 
 	// Route Handlers / Endpoints
 	r.HandleFunc("/api/getStatuses", getStatuses).Methods("GET")
+	r.HandleFunc("/api/getStatus", getStatus).Methods("GET")
 	r.HandleFunc("/api/updateStatus", updateStatus).Methods("POST")
 	r.HandleFunc("/api/hasAccess", hasAccess).Methods("POST")
 	r.HandleFunc("/api/logAccess", logAccess).Methods("POST")
