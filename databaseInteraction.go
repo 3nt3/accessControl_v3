@@ -1,4 +1,4 @@
-package databaseInteraction
+package main
 
 import (
 	"database/sql"
