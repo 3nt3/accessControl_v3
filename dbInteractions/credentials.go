@@ -2,6 +2,8 @@ package dbInteractions
 
 import "fmt"
 
+// Does this get pushed??? Lets find out!
+
 const (
 	DB_HOST     = "35.242.197.244"
 	DB_USR      = "root"
