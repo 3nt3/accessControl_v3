@@ -5,7 +5,7 @@ import "fmt"
 const (
 	DB_HOST     = "35.242.197.244"
 	DB_USR      = "root"
-	DB_PASSWORD = "2j3SggTuZXSSzj"
+	DB_PASSWORD = "s"
 	DB_NAME     = "door_db"
 )
 
