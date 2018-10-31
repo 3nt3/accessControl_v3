@@ -18,6 +18,7 @@ func main() {
 	r.HandleFunc("/api/hasAccess", api.HasAccess).Methods("POST")
 	r.HandleFunc("/api/logAccess", api.LogAccess).Methods("POST")
 	r.HandleFunc("/api/open", api.Open).Methods("GET")
+	r.HandleFunc("/api/testConn", api.TestConn).Methods("GET")
 
 	// Start server
 	go log.Fatal(http.ListenAndServe(":8000", r))

@@ -4,12 +4,14 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"time"
 )
 
+// Inserting data into specified table
 func InsertData(table string, data []interface{}) bool {
 
 	// Establish connection
-	db, err := sql.Open("mysql", dataSorceString)
+	db, err := sql.Open("mysql", dataSourceString)
 	if err != nil {
 		fmt.Println("Connection Failed:", err)
 		return false
@@ -26,10 +28,14 @@ func InsertData(table string, data []interface{}) bool {
 		return true
 
 	case "statusLog":
-		stmt, err := db.Prepare(fmt.Sprintf("INSERT %s SET status=?,creator=?", table))
+		stmt, err := db.Prepare(fmt.Sprintf("INSERT %s SET status=?,creator=?,publishDate=?", table))
 		checkErr(err)
 
-		_, err = stmt.Exec(data[0], data[1])
+		dateString := data[2].(time.Time).String()[0:19]
+
+		fmt.Println(dateString)
+
+		_, err = stmt.Exec(data[0], data[1], dateString)
 		checkErr(err)
 		return true
 

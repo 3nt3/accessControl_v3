@@ -9,10 +9,10 @@ import (
 	"time"
 )
 
-// Get accounts
+// Get data from specified table
 func GetData(table string) []interface{} {
 
-	db, err := sql.Open("mysql", dataSorceString)
+	db, err := sql.Open("mysql", dataSourceString)
 
 	// Get the data!!
 	rows, err := db.Query(fmt.Sprintf("SELECT * FROM %s;", table))
@@ -47,7 +47,12 @@ func GetData(table string) []interface{} {
 			err = rows.Scan(&id, &status, &creator, &publishDate)
 			checkErr(err)
 
-			data = append(data, structs.Status{id, strconv.Itoa(status), creator, publishDate})
+			//fmt.Println(publishDate)
+			publishDateParsed, _ := time.Parse("2006-01-02 15:04:05", publishDate)
+
+			//fmt.Println(publishDateParsed)
+
+			data = append(data, structs.Status{id, status, creator, publishDateParsed})
 
 		}
 		return data
