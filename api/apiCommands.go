@@ -33,7 +33,10 @@ func UpdateStatus(w http.ResponseWriter, r *http.Request) {
 	var newStatus structs.Status
 	_ = json.NewDecoder(r.Body).Decode(&newStatus)
 
-	data := []interface{}{newStatus.Status, newStatus.Creator}
+	newStatus.PublishDate = time.Now()
+	fmt.Println(newStatus)
+
+	data := []interface{}{newStatus.Status, newStatus.Creator, newStatus.PublishDate}
 	dbInteractions.InsertData("statusLog", data)
 	json.NewEncoder(w).Encode(dbInteractions.GetData("statusLog")[len(dbInteractions.GetData("statusLog"))-1])
 }
@@ -94,4 +97,9 @@ func Open(w http.ResponseWriter, r *http.Request) {
 // Log to DB
 func LogAccess(w http.ResponseWriter, r *http.Request) {
 
+}
+
+func TestConn(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode("it works!")
 }

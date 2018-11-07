@@ -4,10 +4,10 @@ import "time"
 
 // Status struct
 type Status struct {
-	ID          int    `json:"id"`
-	Status      string `json:"status"`
-	Creator     string `json:"creator"`
-	PublishDate string `json:"publishDate"`
+	ID          int       `json:"id"`
+	Status      int       `json:"status"`
+	Creator     string    `json:"creator"`
+	PublishDate time.Time `json:"publishDate"`
 }
 
 // Account / Tag struct
