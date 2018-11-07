@@ -11,7 +11,7 @@ import (
 func InsertData(table string, data []interface{}) bool {
 
 	// Establish connection
-	db, err := sql.Open("mysql", dataSourceString)
+	db, err := sql.Open("mysql", DataSorceString)
 	if err != nil {
 		fmt.Println("Connection Failed:", err)
 		return false

@@ -22,6 +22,6 @@ type Account struct {
 // Access struct
 type Access struct {
 	Id         int
-	Account    string
+	Account    string `json:"account"`
 	AccessDate time.Time
 }

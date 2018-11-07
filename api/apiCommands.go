@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+var isOpened bool = false
+
 // Get all statuses
 func GetStatuses(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -92,11 +94,33 @@ func HasAccess(w http.ResponseWriter, r *http.Request) {
 // Open the door
 func Open(w http.ResponseWriter, r *http.Request) {
 	// I actually do not have any clue how to open the door
+
+	// Attempt 1: Just tell the the client to open it somehow
+	// Attempt 2: Set a global var to true for x seconds so the client just has to ask for the current state
+
+	isOpened = true
+	time.Sleep(10)
+	isOpened = false
+
+}
+
+func isOpen(w http.ResponseWriter, r *http.Request) {
+	json.NewEncoder(w).Encode(isOpened)
 }
 
 // Log to DB
 func LogAccess(w http.ResponseWriter, r *http.Request) {
+	var dbData []interface{}
+	var jsonData map[string]string
 
+	_ := json.NewDecoder(r.Body).Decode(&jsonData)
+
+	id := len(dbInteractions.GetData("statusLog"))
+	date := time.Now()
+
+	dbData = []interface{}{id, jsonData["account"], date}
+
+	dbInteractions.InsertData("statusLog", dbData)
 }
 
 func TestConn(w http.ResponseWriter, r *http.Request) {
